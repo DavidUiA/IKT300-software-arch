@@ -60,7 +60,7 @@ internal class Ps2000PowerSupply : IPowerSupply {
         int direction = 0x10; // 0: send data to device, 1: get data from device
         int sender = 0x20; // 1: the telegram is sent by this program, 0: its sent by the powersupply itself
         int transmissionType = 0x40; // 01: query, 10: query response, 11: send data
-        int header = transmissionType + sender + direction + (dataLength - 1); // SD, start delimitet
+        int header = transmissionType + sender + direction + (dataLength - 1); // SD, start delimiter
         byte headerByte = Convert.ToByte(header.ToString(), 10);
 
         //SD, DN, OBJ, CS
@@ -71,13 +71,12 @@ internal class Ps2000PowerSupply : IPowerSupply {
         return bytesToSend;
     }
     
-
     private int GetVoltagePercent() {
         // get voltage
-        byte[] telegram = BuildQueryTelegram((byte) Objects.CurrentVoltage, 6); // quert status
+        byte[] queryTelegram = BuildQueryTelegram((byte) Objects.CurrentVoltage, 6);
 
         // now the byte array is ready to be sent
-        List<byte> responseTelegram = SendAndReceive(telegram, 500);
+        List<byte> responseTelegram = SendAndReceive(queryTelegram, 500);
 
         int percentVolt = 0;
         if (responseTelegram.Count == 0) {
@@ -97,43 +96,41 @@ internal class Ps2000PowerSupply : IPowerSupply {
     }
 
     public float GetMaxVoltage() {
-        byte[] bytesToSend = BuildQueryTelegram((byte) Objects.NominalVoltage, 5);
+        byte[] queryTelegram = BuildQueryTelegram((byte) Objects.NominalVoltage, 5);
 
-        List<byte> response = SendAndReceive(bytesToSend, 50);
+        List<byte> responseTelegram = SendAndReceive(queryTelegram, 50);
 
         float nominalVoltage = 0;
-        if (response == null) {
+        if (responseTelegram.Count == 0) {
             Console.WriteLine("No telegram was read");
         } else {
-            byte[] byteArray = { response[6], response[5], response[4], response[3] };
+            byte[] byteArray = { responseTelegram[6], responseTelegram[5], responseTelegram[4], responseTelegram[3] };
             nominalVoltage = BitConverter.ToSingle(byteArray, 0);
         }
         return nominalVoltage;
     }
 
-    internal void TurnOnRemoteControl() {
-        // Remember the dataframe setup, SD, DN,   OBJ, DATA [hex1, hex2] checksum1, checksum2
-        byte[] bytesToSendToTurnOnRC = new byte[] { 0xF1, 0x00, (byte) Objects.RemoteControl, 0x10, 0x10, 0x01, 0x47 };
-        List<byte> RCresponse = SendAndReceive(bytesToSendToTurnOnRC, 50);
+    private void TurnOnRemoteControl() {
+        // SD, DN,   OBJ, DATA [hex1, hex2] checksum1, checksum2
+        byte[] commandTelegram = new byte[] { 0xF1, 0x00, (byte) Objects.RemoteControl, 0x10, 0x10, 0x01, 0x47 };
+        List<byte> responseTelegram = SendAndReceive(commandTelegram, 50);
 
-        if (RCresponse[3] == 0) {
+        if (responseTelegram[3] == 0) {
             Console.WriteLine("Remote Control is turned on");
         } else {
-            Console.WriteLine($"Remote control is not turned on due to error: {RCresponse[3]}");
+            Console.WriteLine($"Remote control is not turned on due to error: {responseTelegram[3]}");
         }
     }
 
-    internal void TurnOffRemoteControl() {
-        // DATA field is [mask, control] (object list: Mask column comes before Data column) - not
-        // [control, mask] like the earlier attempt assumed. Same bit (0x10) as TurnOnRemoteControl,
-        // just with control set to 0 instead of 1.
-        byte[] bytesToSendToTurnOffRC = new byte[] { 0xF1, 0x00, (byte) Objects.RemoteControl, 0x10, 0x00, 0x01, 0x37 };
-        List<byte> RCresponse = SendAndReceive(bytesToSendToTurnOffRC, 50);
+    private void TurnOffRemoteControl() {
+        // control set to 0 instead of 1.
+        byte[] commandTelegram = new byte[] { 0xF1, 0x00, (byte) Objects.RemoteControl, 0x10, 0x00, 0x01, 0x37 };
+        List<byte> responseTelegram = SendAndReceive(commandTelegram, 50);
 
-        if (RCresponse[3] == 0) {
+        if (responseTelegram[3] == 0) {
             Console.WriteLine("Remote Control is turned off");
         } else {
-            Console.WriteLine($"Remote control is not turned off due to error: {RCresponse[3]}");
+            Console.WriteLine($"Tried to turn off remote control but failed: {responseTelegram[3]}");
         }
     }
 
@@ -163,14 +160,14 @@ internal class Ps2000PowerSupply : IPowerSupply {
             hexValue2 = hexValue;
         }
 
-        byte[] newbytesWithoutChecksum = { 0xF2, 0x00, (byte) Objects.SetVoltage, Convert.ToByte(hexValue1, 16), Convert.ToByte(hexValue2, 16), 0x0, 0x0 };
-        AddChecksum(newbytesWithoutChecksum);
+        byte[] commandTelegram = { 0xF2, 0x00, (byte) Objects.SetVoltage, Convert.ToByte(hexValue1, 16), Convert.ToByte(hexValue2, 16), 0x0, 0x0 };
+        AddChecksum(commandTelegram);
 
-        List<byte> newResponseTelegram = SendAndReceive(newbytesWithoutChecksum, 500);
-        if (newResponseTelegram[3] == 0) {
+        List<byte> responseTelegram = SendAndReceive(commandTelegram, 500);
+        if (responseTelegram[3] == 0) {
             Console.WriteLine("New voltage was set");
         } else {
-            Console.WriteLine(newResponseTelegram[3].ToString());
+            Console.WriteLine(responseTelegram[3].ToString());
         }
     }
 
@@ -186,29 +183,27 @@ internal class Ps2000PowerSupply : IPowerSupply {
         return ReadStringObject((byte) Objects.ArticleNumber);
     }
 
-    // Reads a "ro string" object (max 16 bytes), per the object list. Remember the dataframe
-    // setup, SD, DN, OBJ, DATA, checksum1, checksum2 - a query has no DATA field.
     private string ReadStringObject(byte obj) {
-        byte[] bytesToSend = { 0x7F, 0x00, obj, 0x0, 0x0 };
-        AddChecksum(bytesToSend);
-        List<byte> response = SendAndReceive(bytesToSend, 500);
+        // SD, DN, OBJ, DATA, checksum1, checksum2
+        byte[] queryTelegram = { 0x7F, 0x00, obj, 0x0, 0x0 };
+        AddChecksum(queryTelegram);
+        List<byte> responseTelegram = SendAndReceive(queryTelegram, 500);
 
-        string binary = Convert.ToString(response[0], 2);
+        string binary = Convert.ToString(responseTelegram[0], 2);
         string payloadLengtBinaryString = binary.Substring(4);
         int payloadLength = Convert.ToInt32(payloadLengtBinaryString, 2);
 
         string result = "";
 
-        if (response[2] == obj) { // means that I got a response on obj, which refers to the object list.
+        if (responseTelegram[2] == obj) { // means that I got a response on obj, which refers to the object list.
             for (var i = 0; i < payloadLength; i++) {
-                result += Convert.ToChar(response[3 + i]);
+                result += Convert.ToChar(responseTelegram[3 + i]);
             }
         }
-
         return result;
     }
 
-    enum Objects {
+    private enum Objects {
         DeviceType = 0x00,
         SerialNumber = 0x01,
         NominalVoltage = 0x02,
@@ -217,5 +212,4 @@ internal class Ps2000PowerSupply : IPowerSupply {
         RemoteControl = 0x36,
         SetVoltage = 0x32
     }
-    
 }
