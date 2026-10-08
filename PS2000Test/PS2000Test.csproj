@@ -16,4 +16,8 @@
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PowerSupplyLib\PowerSupplyLib.csproj" />
+  </ItemGroup>
+
 </Project>
