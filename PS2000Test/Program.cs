@@ -1,9 +1,5 @@
 // See https://aka.ms/new-console-template for more information
 
-using System;
-using System.Collections;
-using System.IO.Ports;
-using System.Windows.Forms;
 using PowerSupplyLib;
 
 internal class Program {
@@ -18,7 +14,7 @@ internal class Program {
     public void Startup() {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        IPowerSupply powerSupply = PowerSupplyFactory.CreatePowerSupply();
+        IPowerSupply powerSupply = PowerSupplyFactory.CreatePowerSupply(0);
         Application.Run(new StatusForm(powerSupply));
     }
 }
