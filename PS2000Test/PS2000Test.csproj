@@ -1,23 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PowerSupplyLib\PowerSupplyLib.csproj" />
-  </ItemGroup>
-
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UseWindowsForms>true</UseWindowsForms>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\.editorconfig" Link=".editorconfig" />
+        
+        <PackageReference Include="System.IO.Ports" Version="10.0.0" />
+        
+        <ProjectReference Include="..\PowerSupplyLib\PowerSupplyLib.csproj" />
+    </ItemGroup>
 </Project>

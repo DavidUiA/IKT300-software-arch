@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS2000Test", "PS2000Test\PS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSupplyLib", "PowerSupplyLib\PowerSupplyLib.csproj", "{D7D87F08-503C-4D99-900D-F96786BC03B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsuService", "PsuService\PsuService.csproj", "{BE18D6E3-F529-48BE-B874-6289196A4E45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D7D87F08-503C-4D99-900D-F96786BC03B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7D87F08-503C-4D99-900D-F96786BC03B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7D87F08-503C-4D99-900D-F96786BC03B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE18D6E3-F529-48BE-B874-6289196A4E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE18D6E3-F529-48BE-B874-6289196A4E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE18D6E3-F529-48BE-B874-6289196A4E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE18D6E3-F529-48BE-B874-6289196A4E45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
