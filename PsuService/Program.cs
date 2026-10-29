@@ -74,16 +74,20 @@ internal static class Program {
             [MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE]);
 
         while (true) {
-            double newCurrentVoltage;
-            lock (psuLock) { // thread safe
-                newCurrentVoltage = powerSupply.GetVoltage();
+            try {
+                double newCurrentVoltage;
+                lock (psuLock) { // thread safe
+                    newCurrentVoltage = powerSupply.GetVoltage();
+                }
+                if (newCurrentVoltage != currentVoltage) {
+                    string topic = "/psu/get/voltage";
+                    mqttClient.Publish(topic, Encoding.UTF8.GetBytes(newCurrentVoltage.ToString(CultureInfo.InvariantCulture)), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
+                    currentVoltage = newCurrentVoltage;
+                }
+            } catch (Exception ex) {
+                Console.WriteLine($"Failed to poll voltage: {ex.Message}");
             }
-            if (newCurrentVoltage != currentVoltage) {
-                currentVoltage = newCurrentVoltage;
-                string topic = "/psu/get/voltage";
-                mqttClient.Publish(topic, Encoding.UTF8.GetBytes(currentVoltage.ToString(CultureInfo.InvariantCulture)), MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, true);
-            }
-            Thread.Sleep(200); // outside the lock, so the handler can use the PSU while we wait
+            Thread.Sleep(200); // give thread to others, we dont need to spam the psu
         }
     }
 }

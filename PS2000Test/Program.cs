@@ -1,10 +1,4 @@
-// See https://aka.ms/new-console-template for more information
-
-using System;
-using System.Collections;
-using System.IO.Ports;
-using System.Windows.Forms;
-using PowerSupplyLib;
+using uPLibrary.Networking.M2Mqtt;
 
 internal class Program {
     [STAThread]
@@ -13,12 +7,11 @@ internal class Program {
         p.Startup();
     }
 
-    // Runs the read-only checks and shows them in a window. Current voltage can change
-    // while the window is open, so StatusForm keeps re-reading it on a timer.
     public void Startup() {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        IPowerSupply powerSupply = PowerSupplyFactory.CreatePowerSupply();
-        Application.Run(new StatusForm(powerSupply));
+        string connectionString = "10.0.0.118";
+        MqttClient mqttClient  = new MqttClient(connectionString);
+        Application.Run(new StatusForm(mqttClient));
     }
 }

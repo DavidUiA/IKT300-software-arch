@@ -9,8 +9,6 @@
     <ItemGroup>
         <None Include="..\.editorconfig" Link=".editorconfig" />
         
-        <PackageReference Include="System.IO.Ports" Version="10.0.0" />
-        
-        <ProjectReference Include="..\PowerSupplyLib\PowerSupplyLib.csproj" />
+        <PackageReference Include="M2Mqtt" Version="4.3.0" />
     </ItemGroup>
 </Project>
