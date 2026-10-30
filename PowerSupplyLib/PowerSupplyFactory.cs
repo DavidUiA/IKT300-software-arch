@@ -8,6 +8,9 @@ public static class PowerSupplyFactory {
             case 0:
                 powerSupply = new Ps2000PowerSupply();
                 break;
+            case 1:
+                powerSupply = new DummyPowerSupply();
+                break;
             default:
                 return null;
         }

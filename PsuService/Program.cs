@@ -19,7 +19,7 @@ internal static class Program {
     static void Main(string[] args) {
         Console.WriteLine("Hello, World!");
 
-        powerSupply = PowerSupplyFactory.CreatePowerSupply();
+        powerSupply = PowerSupplyFactory.CreatePowerSupply(1);
         mqttClient = new MqttClient(connectionString);
         mqttClient.Connect("PowerSupply");
 
