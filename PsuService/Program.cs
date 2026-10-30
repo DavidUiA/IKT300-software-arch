@@ -8,7 +8,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 namespace PsuService;
 
 internal static class Program {
-    static string connectionString = "10.0.0.118";
+    static string connectionString = "localhost";
     private static IPowerSupply powerSupply;
     private static MqttClient mqttClient;
     

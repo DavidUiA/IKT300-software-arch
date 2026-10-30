@@ -10,7 +10,7 @@ internal class Program {
     public void Startup() {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        string connectionString = "10.0.0.118";
+        string connectionString = "localhost";
         MqttClient mqttClient  = new MqttClient(connectionString);
         Application.Run(new StatusForm(mqttClient));
     }
